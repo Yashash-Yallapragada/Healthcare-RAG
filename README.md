@@ -55,7 +55,6 @@ Stores factuality and consistency evaluation scores.
 
 
 
-
 # Embedding Model
 
 Embeddings were generated using:
@@ -63,6 +62,135 @@ Embeddings were generated using:
 - sentence-transformers
 - all-MiniLM-L6-v2
 
+# Data Dictionary
+
+## source.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| source_id | Unique identifier for healthcare source | INT | Positive integer |
+| source_name | Name of healthcare organization | VARCHAR | WHO, CDC, NIH, etc. |
+| organization_type | Type of organization | VARCHAR | Government, Research, Public Health |
+| source_url | Official source website URL | VARCHAR | Valid URL |
+| source_reliability | Reliability/confidence metadata for source | VARCHAR | Typically 0.00–1.00 |
+
+---
+
+## document.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| document_id | Unique identifier for document | INT | Positive integer |
+| title | Title of healthcare document | VARCHAR | Medical document titles |
+| publication_date | Publication date of document | VARCHAR | DD-MM-YYYY |
+| source_id | References source table | INT | Existing source_id |
+| document_type | Type of document | VARCHAR | Guideline, Report, Article |
+| medical_speciality | Medical domain/category | VARCHAR | Cardiology, Infectious Disease, etc. |
+
+---
+
+## section.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| section_id | Unique identifier for section | INT | Positive integer |
+| document_id | References document table | INT | Existing document_id |
+| section_title | Section heading/title | VARCHAR | Symptoms, Prevention, Treatment |
+
+---
+
+## chunk.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| chunk_id | Unique identifier for semantic chunk | SMALLINT | Positive integer |
+| chunk_text | Semantic healthcare text chunk | VARCHAR(MAX) | Natural language healthcare text |
+| chunk_index | Positional order of chunk within section | INT | Positive integer |
+| section_id | References section table | INT | Existing section_id |
+
+---
+
+## embedding.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| embedding_id | Unique embedding identifier | INT | Positive integer |
+| chunk_id | References chunk table | SMALLINT | Existing chunk_id |
+| embedding_model | Embedding model used | VARCHAR | all-MiniLM-L6-v2 |
+| embedding_vector | Semantic embedding vector | VARCHAR(MAX) | Vector representation of chunk |
+
+---
+
+## topic.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| topic_id | Unique topic identifier | SMALLINT | Positive integer |
+| topic_name | Healthcare topic name | VARCHAR | Dengue, Diabetes, Asthma |
+| topic_category | Topic classification category | VARCHAR | Infectious Disease, Mental Health |
+
+---
+
+## chunk_topic.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| chunk_id | References chunk table | SMALLINT | Existing chunk_id |
+| topic_id | References topic table | SMALLINT | Existing topic_id |
+
+---
+
+## user_query.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| query_id | Unique query identifier | INT | Positive integer |
+| query_text | Realistic healthcare user query | VARCHAR(MAX) | Natural language query |
+| query_timestamp | Timestamp of query | DATETIME | DD-MM-YYYY HH:MM:SS |
+
+---
+
+## retrieved_chunk.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| query_id | References user_query table | INT | Existing query_id |
+| chunk_id | References chunk table | SMALLINT | Existing chunk_id |
+| relevance_score | Semantic retrieval relevance score | DECIMAL(4,3) | 0.000–1.000 |
+
+---
+
+## response.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| response_id | Unique response identifier | INT | Positive integer |
+| query_id | References user_query table | INT | Existing query_id |
+| generated_answer | AI-generated healthcare response | NVARCHAR(MAX) | Natural language answer |
+| confidence_score | Confidence score for response | DECIMAL(4,3) | 0.000–1.000 |
+
+---
+
+## evaluation.csv
+
+| Column | Description | Data Type | Allowed Values / Notes |
+|---|---|---|---|
+| evaluation_id | Unique evaluation identifier | INT | Positive integer |
+| response_id | References response table | INT | Existing response_id |
+| factuality_score | Factual correctness score | DECIMAL(4,3) | 0.000–1.000 |
+| consistency_score | Logical consistency score | DECIMAL(4,3) | 0.000–1.000 |
+| notes | Reliability evaluation notes | VARCHAR(MAX) | Natural language evaluation |
+| response_timestamp | Timestamp of evaluation | DATETIME | DD-MM-YYYY HH:MM:SS |
+
+---
+
+# Dataset Notes
+
+- The dataset contains 1183+ semantic healthcare chunks.
+- User queries were expanded from 15 to 70 realistic healthcare queries to improve behavioral realism.
+- AI-generated responses and evaluation metrics were similarly expanded to simulate realistic RAG system interaction.
+- Semantic embeddings were generated using sentence-transformers (`all-MiniLM-L6-v2`).
+- Retrieval mappings simulate semantic top-k chunk retrieval behavior in a healthcare RAG pipeline.
 
 
 
